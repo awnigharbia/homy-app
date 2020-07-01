@@ -1,13 +1,18 @@
-import 'package:flutter/material.dart';
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_firestore_todos/blocs/authentication_bloc/bloc.dart';
-import 'package:flutter_firestore_todos/blocs/register_bloc/register.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shop_repository/shop_repository.dart';
 import 'package:todos_repository/todos_repository.dart';
-import 'package:flutter_firestore_todos/blocs/blocs.dart';
-import 'package:flutter_firestore_todos/screens/screens.dart';
 import 'package:user_repository/user_repository.dart';
+
+import 'package:flutter_firestore_todos/blocs/authentication_bloc/bloc.dart';
+import 'package:flutter_firestore_todos/blocs/blocs.dart';
+import 'package:flutter_firestore_todos/blocs/shopRegister_bloc/shop_register_bloc.dart';
+import 'package:flutter_firestore_todos/screens/screens.dart';
+
+import 'blocs/create_shop_bloc/bloc.dart';
+import 'blocs/imagePicker_bloc/selectedImages_bloc.dart';
 
 void main() {
   BlocSupervisor.delegate = SimpleBlocDelegate();
@@ -23,19 +28,23 @@ class MyApp extends StatelessWidget {
           create: (context) {
             return AuthenticationBloc(
               userRepository: UserRepository(),
+              shopRepository: FirebaseShopRepository(),
             )..add(AppStarted());
           },
-        ),
-        BlocProvider<RegisterBloc>(
-          create: (context) => RegisterBloc(
-            userRepository: UserRepository(),
-          ),
         ),
         BlocProvider<LoginBloc>(
           create: (context) => LoginBloc(
             userRepository: UserRepository(),
           ),
         ),
+        BlocProvider(
+          create: (context) => ShopRegisterBloc(
+            shopRepository: FirebaseShopRepository(),
+          ),
+        ),
+        BlocProvider<SelectedImagesBloc>(
+          create: (context) => SelectedImagesBloc(),
+        )
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -56,9 +65,6 @@ class MyApp extends StatelessWidget {
           },
           "/shopCollection/": (context) {
             return ShopCollection();
-          },
-          "/shopCollection/custom": (context) {
-            return MyShopCollection();
           },
           "/settings": (context) {
             return SettingsScreen();
@@ -87,11 +93,18 @@ class MyApp extends StatelessWidget {
                   return ChooseTypeScreen(email: state.email);
                 }
                 if (state is TraderRegisterShop) {
-                  return ShopSignup();
+                  return BlocProvider(
+                    create: (context) => CreateShopBloc(),
+                    child: ShopSignup(),
+                  );
                 }
                 if (state is Unauthenticated) {
-                  return BlocProvider(
-                    create: (context) => OnBoardBloc(),
+                  return MultiBlocProvider(
+                    providers: [
+                      BlocProvider(
+                        create: (context) => OnBoardBloc(),
+                      ),
+                    ],
                     child: OnBoardingScreen(),
                   );
                 }

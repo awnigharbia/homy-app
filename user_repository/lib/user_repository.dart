@@ -1,4 +1,4 @@
 library user_repository;
 
 export 'src/user_repository.dart';
-export 'src/user.dart';
+export 'src/models/user.dart';

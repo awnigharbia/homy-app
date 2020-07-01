@@ -1,10 +1,14 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_firestore_todos/widgets/myShop_widgets/myShop_header_details.dart';
 import 'package:flutter_firestore_todos/widgets/widgets.dart';
+import 'package:shop_repository/shop_repository.dart';
 
 class MyShopSliverAppBarr extends StatelessWidget {
   final TabController controller;
-  const MyShopSliverAppBarr({Key key, this.controller}) : super(key: key);
+  final Shop shop;
+  const MyShopSliverAppBarr({Key key, this.controller, this.shop})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -174,30 +178,7 @@ class MyShopSliverAppBarr extends StatelessWidget {
                       SizedBox(
                         width: 10,
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            "Al Hello Shop",
-                            style: TextStyle(fontSize: 14.0),
-                          ),
-                          Text(
-                            "Fashion and Style",
-                            style: TextStyle(fontSize: 8),
-                          ),
-                          SizedBox(height: 2.0),
-                          Row(
-                            children: List.generate(
-                              5,
-                              (int index) => Icon(
-                                EvaIcons.star,
-                                size: 10.0,
-                                color: Colors.yellow[400],
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
+                      MyShopHeaderDetails(),
                     ],
                   ),
                   DynamicFlexibleSpaceBarTitle(

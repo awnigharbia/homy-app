@@ -1,5 +1,7 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_firestore_todos/blocs/authentication_bloc/bloc.dart';
 import 'package:flutter_firestore_todos/screens/screens.dart';
 import 'package:flutter_firestore_todos/widgets/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -73,11 +75,11 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ),
                 settingsItem(
-                  name: "Full name",
+                  name: "Username",
                   icon: EvaIcons.person,
                   tap: () {
                     Navigator.of(context)
-                        .push(SlideLeftRoute(widget: SettingsName()));
+                        .push(SlideLeftRoute(widget: SettingsUsername()));
                   },
                 ),
                 settingsItem(
@@ -97,7 +99,7 @@ class SettingsScreen extends StatelessWidget {
                   },
                 ),
                 settingsItem(
-                    name: "Delete account",
+                    name: "Disable account",
                     icon: EvaIcons.trash2,
                     tap: () {
                       showDialog(
@@ -146,51 +148,89 @@ class SettingsScreen extends StatelessWidget {
                   height: 1,
                   color: Colors.grey[200],
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    "STORE SETTINGS",
-                    style: settingsHeader,
-                  ),
-                ),
-                settingsItem(
-                  name: "Store name",
-                  icon: Icons.edit,
-                  tap: () {
-                    Navigator.of(context)
-                        .push(SlideLeftRoute(widget: SettingsStoreName()));
-                  },
-                ),
-                settingsItem(
-                  name: "Store description",
-                  icon: EvaIcons.infoOutline,
-                  tap: () {
-                    Navigator.of(context).push(
-                        SlideLeftRoute(widget: SettingsStoreDescription()));
-                  },
-                ),
-                settingsItem(
-                  name: "Store location",
-                  icon: Icons.location_on,
-                  tap: () {
-                    Navigator.of(context)
-                        .push(SlideLeftRoute(widget: SettingsStoreLocation()));
-                  },
-                ),
-                settingsItem(
-                  name: "Store Number",
-                  icon: EvaIcons.phoneOutline,
-                  tap: () {
-                    Navigator.of(context)
-                        .push(SlideLeftRoute(widget: SettingsStorePhone()));
-                  },
-                ),
-                settingsItem(
-                  name: "Store type",
-                  icon: EvaIcons.shoppingCartOutline,
-                  tap: () {
-                    Navigator.of(context)
-                        .push(SlideLeftRoute(widget: SettingsStoreType()));
+                BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                  builder: (context, state) {
+                    if (state is Authenticated) {
+                      return state.user.userRole == 'Trader'
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Text(
+                                    "STORE SETTINGS",
+                                    style: settingsHeader,
+                                  ),
+                                ),
+                                settingsItem(
+                                  name: "Store name",
+                                  icon: Icons.edit,
+                                  tap: () {
+                                    Navigator.of(context).push(
+                                      SlideLeftRoute(
+                                        widget: SettingsStoreName(
+                                          shop: state.shop,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                settingsItem(
+                                  name: "Store description",
+                                  icon: EvaIcons.infoOutline,
+                                  tap: () {
+                                    Navigator.of(context).push(
+                                      SlideLeftRoute(
+                                        widget: SettingsStoreDescription(
+                                          shop: state.shop,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                settingsItem(
+                                  name: "Store location",
+                                  icon: Icons.location_on,
+                                  tap: () {
+                                    Navigator.of(context).push(
+                                      SlideLeftRoute(
+                                        widget: SettingsStoreLocation(
+                                          shop: state.shop,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                settingsItem(
+                                  name: "Store Number",
+                                  icon: EvaIcons.phoneOutline,
+                                  tap: () {
+                                    Navigator.of(context).push(
+                                      SlideLeftRoute(
+                                        widget: SettingsStorePhone(
+                                          shop: state.shop,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                settingsItem(
+                                  name: "Store type",
+                                  icon: EvaIcons.shoppingCartOutline,
+                                  tap: () {
+                                    Navigator.of(context).push(
+                                      SlideLeftRoute(
+                                        widget: SettingsStoreType(
+                                          shop: state.shop,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            )
+                          : SizedBox();
+                    }
                   },
                 ),
                 Divider(

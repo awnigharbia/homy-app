@@ -1,20 +1,48 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:photo_manager/photo_manager.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_firestore_todos/blocs/blocs.dart';
+import 'package:flutter_firestore_todos/widgets/widgets.dart';
+import 'package:rules/rules.dart';
+import 'package:shop_repository/shop_repository.dart';
 
-class PublishPage extends StatefulWidget {
-  final List<AssetEntity> selectedImages;
-  final double imageRadius = 5;
-  const PublishPage({Key key, this.selectedImages}) : super(key: key);
+class PublishPage extends StatelessWidget {
+  const PublishPage({Key key}) : super(key: key);
 
   @override
-  _PublishPageState createState() => _PublishPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) =>
+          UploadImageBloc(shopRepository: FirebaseShopRepository()),
+      child: PublishPageProvided(),
+    );
+  }
 }
 
-class _PublishPageState extends State<PublishPage> {
-  bool isOffer = false;
+class PublishPageProvided extends StatefulWidget {
+  PublishPageProvided({Key key}) : super(key: key);
 
-  String dropdownValue = 'Section 1';
+  @override
+  _PublishPageProvidedState createState() => _PublishPageProvidedState();
+}
+
+class _PublishPageProvidedState extends State<PublishPageProvided> {
+  String value = 'All';
+  final _descriptionController = TextEditingController();
+  final _priceController = TextEditingController();
+  final _offerPriceController = TextEditingController();
+  final _inStockController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  void setValue(String newValue) {
+    setState(() {
+      value = newValue;
+    });
+  }
+
+  int parseToInt(String number) {
+    return number.trim() != '' ? int.parse(number) : 0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,271 +60,162 @@ class _PublishPageState extends State<PublishPage> {
           ),
         ),
         actions: <Widget>[
-          FlatButton(
-            onPressed: () {
-              print("post");
-            },
-            child: Text(
-              "Post",
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          )
+          BlocBuilder<AuthenticationBloc, AuthenticationState>(
+              builder: (context, state) {
+            if (state is Authenticated) {
+              return BlocBuilder<SelectedImagesBloc, SelectedImagesState>(
+                  builder: (context, image) {
+                if (image is SelectedImages)
+                  return FlatButton(
+                    onPressed: () {
+                      if (_formKey.currentState.validate()) {
+                        BlocProvider.of<UploadImageBloc>(context).add(
+                          UploadImage(
+                            product: Product(
+                              description: _descriptionController.text,
+                              price: parseToInt(_priceController.text),
+                              offerPrice:
+                                  parseToInt(_offerPriceController.text),
+                              inStock: parseToInt(_inStockController.text),
+                              category: value,
+                              authorId: state.user.id,
+                              photos: image.selectedImages,
+                            ),
+                          ),
+                        );
+                      }
+                      return null;
+                    },
+                    child: Text(
+                      "Post",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  );
+
+                return SizedBox();
+              });
+            }
+          })
         ],
       ),
-      body: Container(
-        width: MediaQuery.of(context).size.width,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                height: 200,
-                child: ListView(
-                  padding: EdgeInsets.all(16.0),
-                  scrollDirection: Axis.horizontal,
-                  children: widget.selectedImages
-                      .asMap()
-                      .map(
-                        (index, image) => MapEntry(
-                          index,
-                          FutureBuilder(
-                            future: image.originBytes,
-                            builder: (BuildContext context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.done) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(right: 8.0),
-                                  child: SizedBox(
-                                    width: 200,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(
-                                          widget.imageRadius),
-                                      child: Image.memory(
-                                        snapshot.data,
-                                        fit: BoxFit.cover,
-                                        scale: 5,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }
-                              return Container();
-                            },
-                          ),
-                        ),
-                      )
-                      .values
-                      .toList(),
+      body: BlocListener<UploadImageBloc, UploadImageState>(
+        listener: (context, state) {
+          if (state is UploadImageProgress) {
+            Scaffold.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  duration: Duration(minutes: 10),
+                  behavior: SnackBarBehavior.floating,
+                  content: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(EvaIcons.cloudUploadOutline),
+                      Text(' Publishing your product....'),
+                    ],
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
+              );
+          }
+          if (state is UploadImageSuccess) {
+            Scaffold.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  behavior: SnackBarBehavior.floating,
+                  content: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(
+                        EvaIcons.checkmarkCircle2,
+                        color: Colors.green[800],
+                      ),
+                      Text(' Product published'),
+                    ],
+                  ),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            BlocProvider.of<SelectedImagesBloc>(context).add(ClearSelected());
+            BlocProvider.of<UploadImageBloc>(context).add(ClearUploadImage());
+            int count = 0;
+            Navigator.of(context).popUntil((_) => count++ >= 2);
+          }
+        },
+        child: BlocBuilder<SelectedImagesBloc, SelectedImagesState>(
+            builder: (context, state) {
+          if (state is SelectedImages)
+            return Container(
+              width: MediaQuery.of(context).size.width,
+              child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    TextField(
-                      decoration: InputDecoration(
-                        hintText: "write a description",
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        errorBorder: InputBorder.none,
-                        disabledBorder: InputBorder.none,
-                      ),
-                      minLines: 3,
-                      maxLines: 6,
+                    PreviewSelectedImages(
+                      selectedImages: state.selectedImages,
                     ),
-                    Divider(
-                      height: 1,
-                      color: Colors.grey,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text(
-                        "Additional Info",
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          "Section",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12.0,
-                          ),
-                        ),
-                        DropdownButton<String>(
-                          value: dropdownValue,
-                          icon: Icon(EvaIcons.arrowIosDownwardOutline),
-                          iconSize: 24,
-                          elevation: 16,
-                          underline: Container(
-                            height: 0,
-                          ),
-                          onChanged: (String newValue) {
-                            setState(() {
-                              dropdownValue = newValue;
-                            });
-                          },
-                          items: <String>[
-                            'Section 1',
-                            'section 2',
-                            'section 3',
-                            'section 4'
-                          ].map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          "Offer",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12.0,
-                          ),
-                        ),
-                        Switch(
-                          onChanged: (value) {
-                            setState(() {
-                              isOffer = value;
-                            });
-                          },
-                          value: isOffer,
-                        ),
-                      ],
-                    ),
-                    isOffer
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                "Offer percentage",
+                    Form(
+                      key: _formKey,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            TextFormField(
+                              validator: (description) {
+                                final rule = Rule(
+                                  description,
+                                  name: "Description",
+                                  isRequired: false,
+                                  maxLength: 2000,
+                                );
+
+                                return rule.hasError ? rule.error : null;
+                              },
+                              controller: _descriptionController,
+                              decoration: InputDecoration(
+                                hintText: "write a description",
+                                border: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                errorBorder: InputBorder.none,
+                                disabledBorder: InputBorder.none,
+                              ),
+                              minLines: 3,
+                              maxLines: 6,
+                            ),
+                            Divider(
+                              height: 1,
+                              color: Colors.grey,
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 16.0),
+                              child: Text(
+                                "Additional Info",
                                 style: TextStyle(
+                                  fontSize: 16.0,
                                   fontWeight: FontWeight.w600,
-                                  fontSize: 12.0,
                                 ),
                               ),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.29,
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    hintText: "offer %",
-                                    border: InputBorder.none,
-                                    focusedBorder: InputBorder.none,
-                                    enabledBorder: InputBorder.none,
-                                    errorBorder: InputBorder.none,
-                                    disabledBorder: InputBorder.none,
-                                  ),
-                                  keyboardType: TextInputType.number,
-                                ),
-                              )
-                            ],
-                          )
-                        : SizedBox(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          "Product Price",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12.0,
-                          ),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.29,
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: "Enter price ₪",
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
                             ),
-                            keyboardType: TextInputType.number,
-                          ),
-                        )
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          "In Stock",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12.0,
-                          ),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.25,
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: "Enter total",
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                            ),
-                            keyboardType: TextInputType.number,
-                          ),
-                        )
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          "Product size",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12.0,
-                          ),
-                        ),
-                        ToggleButtons(
-                          borderRadius: BorderRadius.circular(5.0),
-                          onPressed: (int index) {
-                            print("change size");
-                          },
-                          children: <Widget>[
-                            Text("S"),
-                            Text("M"),
-                            Text("XL"),
-                            Text("XXL"),
-                            Text("XXXL"),
+                            SectionDropdown(value: value, setValue: setValue),
+                            IsOfferSection(controller: _offerPriceController),
+                            PriceSection(controller: _priceController),
+                            InStockSection(controller: _inStockController),
                           ],
-                          isSelected: [
-                            true,
-                            false,
-                            false,
-                            false,
-                            false,
-                          ],
-                        )
-                      ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
-        ),
+            );
+
+          return SizedBox();
+        }),
       ),
     );
   }

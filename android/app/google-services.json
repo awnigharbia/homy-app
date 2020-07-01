@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "813481986217",
+    "firebase_url": "https://homy-d56f8.firebaseio.com",
+    "project_id": "homy-d56f8",
+    "storage_bucket": "homy-d56f8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:813481986217:android:45c1117486ce97dd4081b8",
+        "android_client_info": {
+          "package_name": "com.example.flutter_firestore_todos245"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "813481986217-0r6vvkndtppefd9eg3okvsvd7qsv8898.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flutter_firestore_todos245",
+            "certificate_hash": "9cc00e230331fb3025c3f01e296e603c8385b941"
+          }
+        },
+        {
+          "client_id": "813481986217-smuohdij450b2su3lhejpo5i414v6euc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-ueuGuH0U_Yv4L4Z2NZAH4on-V9qjFE8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "813481986217-smuohdij450b2su3lhejpo5i414v6euc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_firestore_todos/screens/screens.dart';
 
 
+typedef ChangeCategory = Function(ShopCategories category);
+
 class TypeBox extends StatelessWidget {
   final String url;
   final String name;
   final bool active;
   final ShopCategories categories;
   final ShopCategories category;
-  final void changeCategory;
+  final ChangeCategory changeCategory;
   const TypeBox(
       {Key key,
       @required this.url,
@@ -49,7 +51,7 @@ class TypeBox extends StatelessWidget {
             value: category,
             groupValue: categories,
             onChanged: (val) {
-              print(val);
+              changeCategory(val);
             },
           )
         ],

@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_firestore_todos/blocs/authentication_bloc/bloc.dart';
-import 'package:user_repository/src/user.dart';
+import 'package:shop_repository/shop_repository.dart';
+import 'package:user_repository/user_repository.dart';
 
 abstract class AuthenticationState extends Equatable {
   const AuthenticationState();
@@ -13,15 +13,16 @@ class Uninitialized extends AuthenticationState {}
 
 class Authenticated extends AuthenticationState {
   final User user;
+  final Shop shop;
 
-  const Authenticated(this.user);
+  const Authenticated(this.user, this.shop);
 
   @override
-  List<Object> get props => [user];
+  List<Object> get props => [user, shop];
 
   @override
   String toString() =>
-      'Authenticated { userId: ${user.id}, username:${user.username}, email:${user.email}, userRole:${user.userRole} }';
+      'Authenticated { userId: ${user.id}, username:${user.username}, email:${user.email}, userRole:${user.userRole}, currentShopInfo:$shop }';
 }
 
 class AuthenticatedNotComplete extends AuthenticationState {
@@ -35,6 +36,16 @@ class AuthenticatedNotComplete extends AuthenticationState {
   String toString() => 'Authentication not complete for email:$email';
 }
 
-class TraderRegisterShop extends AuthenticationState {}
+class TraderRegisterShop extends AuthenticationState {
+  final String userId;
+
+  TraderRegisterShop(this.userId);
+
+  @override
+  List<Object> get props => [userId];
+
+  @override
+  String toString() => 'RegisterShop for userId:$userId';
+}
 
 class Unauthenticated extends AuthenticationState {}

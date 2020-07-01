@@ -1,16 +1,21 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:shop_repository/shop_repository.dart';
 import 'package:user_repository/user_repository.dart';
 import 'package:flutter_firestore_todos/blocs/authentication_bloc/bloc.dart';
 
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
   final UserRepository _userRepository;
+  final FirebaseShopRepository _shopRepository;
 
-  AuthenticationBloc({@required UserRepository userRepository})
-      : assert(userRepository != null),
-        _userRepository = userRepository;
+  AuthenticationBloc(
+      {@required UserRepository userRepository,
+      @required FirebaseShopRepository shopRepository})
+      : assert(userRepository != null, shopRepository != null),
+        _userRepository = userRepository,
+        _shopRepository = shopRepository;
 
   @override
   AuthenticationState get initialState => Uninitialized();
@@ -26,7 +31,13 @@ class AuthenticationBloc
     } else if (event is NotComplete) {
       yield* _mapNotCompletedToState();
     } else if (event is ShopRegister) {
-      yield* _mapShopRegisterToState();
+      yield* _mapShopRegisterToState(event.userId);
+    } else if (event is UpdateUser) {
+      yield* _mapUpdateUserToState(event.user);
+    } else if (event is UpdateEmail) {
+      yield* _mapUpdateEmailToState(event.user);
+    } else if (event is UpdatePassword) {
+      yield* _mapUpdatePasswordToState(event.password);
     } else if (event is LoggedOut) {
       yield* _mapLoggedOutToState();
     }
@@ -35,21 +46,40 @@ class AuthenticationBloc
   Stream<AuthenticationState> _mapLoggedInToState() async* {
     try {
       await _userRepository.getUser();
+      final isHaveShop =
+          await _shopRepository.isShopOwner(_userRepository.currentUser.id);
 
       if (_userRepository.currentUser.userRole == 'Customer') {
-        yield Authenticated(_userRepository.currentUser);
-      } else if (!_userRepository.isTraderHaveShop()) {
-        yield TraderRegisterShop();
+        final shopInfo =
+            await _shopRepository.getShopInfo(_userRepository.currentUser.id);
+        yield Authenticated(_userRepository.currentUser, shopInfo[0]);
+      } else if (!isHaveShop) {
+        yield TraderRegisterShop(_userRepository.currentUser.id);
       } else {
-        yield Authenticated(_userRepository.currentUser);
+        final shopInfo =
+            await _shopRepository.getShopInfo(_userRepository.currentUser.id);
+        yield Authenticated(_userRepository.currentUser, shopInfo[0]);
       }
     } catch (e) {
       // e.message;
     }
   }
 
-  Stream<AuthenticationState> _mapShopRegisterToState() async* {
-    yield TraderRegisterShop();
+  Stream<AuthenticationState> _mapUpdateUserToState(User user) async* {
+    await _userRepository.updateUserData(user);
+  }
+
+  Stream<AuthenticationState> _mapUpdatePasswordToState(
+      String password) async* {
+    await _userRepository.updateUserPassword(password);
+  }
+
+  Stream<AuthenticationState> _mapUpdateEmailToState(User user) async* {
+    await _userRepository.updateUserEmail(user);
+  }
+
+  Stream<AuthenticationState> _mapShopRegisterToState(String userId) async* {
+    yield TraderRegisterShop(userId);
   }
 
   Stream<AuthenticationState> _mapLoggedOutToState() async* {
@@ -64,18 +94,27 @@ class AuthenticationBloc
 
   Stream<AuthenticationState> _mapAppStartedToState() async* {
     try {
+      await _userRepository.getUser();
+
       final isSignedIn = await _userRepository.isSignedIn();
+      final isHaveShop =
+          await _shopRepository.isShopOwner(_userRepository.currentUser.id);
+
       if (!isSignedIn) {
         yield Unauthenticated();
       }
-      await _userRepository.getUser();
-      // if (_userRepository.currentUser.userRole == 'Customer') {
-      //   yield Authenticated(_userRepository.currentUser);
-      // } else if (!_userRepository.isTraderHaveShop()) {
-      //   yield TraderRegisterShop();
-      // } else {
-        yield Authenticated(_userRepository.currentUser);
-      // }
+
+      if (_userRepository.currentUser.userRole == 'Customer') {
+        final shopInfo =
+            await _shopRepository.getShopInfo(_userRepository.currentUser.id);
+        yield Authenticated(_userRepository.currentUser, shopInfo[0]);
+      } else if (!isHaveShop) {
+        yield TraderRegisterShop(_userRepository.currentUser.id);
+      } else {
+        final shopInfo =
+            await _shopRepository.getShopInfo(_userRepository.currentUser.id);
+        yield Authenticated(_userRepository.currentUser, shopInfo[0]);
+      }
     } catch (_) {
       yield Unauthenticated();
     }

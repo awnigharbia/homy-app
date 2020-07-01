@@ -1,32 +1,41 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_firestore_todos/screens/screens.dart';
-import 'package:flutter_firestore_todos/widgets/widgets.dart';
 import 'package:md2_tab_indicator/md2_tab_indicator.dart';
 import 'package:photo_manager/photo_manager.dart';
 
-import 'imagePicker_bloc/selectedImages_bloc.dart';
-import 'imagePicker_bloc/selectedImages_events.dart';
+import 'package:flutter_firestore_todos/blocs/imagePicker_bloc/selectedImages_bloc.dart';
+import 'package:flutter_firestore_todos/blocs/imagePicker_bloc/selectedImages_events.dart';
+import 'package:flutter_firestore_todos/blocs/imagePicker_bloc/selectedImages_state.dart';
 
-class ImagePick extends StatefulWidget {
-  ImagePick({Key key, this.title}) : super(key: key);
-  final String title;
-  @override
-  _ImagePickState createState() => _ImagePickState();
-}
+class ImagePick extends StatelessWidget {
+  final int maxSelect;
+  final VoidCallback callback;
 
-class _ImagePickState extends State<ImagePick> {
+  const ImagePick({
+    Key key,
+    this.maxSelect,
+    this.callback,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<SelectedImagesBloc>(
-      create: (context) => SelectedImagesBloc(),
-      child: MediaGrid(),
+    return MediaGrid(
+      maxSelect: maxSelect,
+      callback: callback,
     );
   }
 }
 
 class MediaGrid extends StatefulWidget {
+  final int maxSelect;
+  final VoidCallback callback;
+  const MediaGrid({
+    Key key,
+    this.maxSelect,
+    this.callback,
+  }) : super(key: key);
+
   @override
   _MediaGridState createState() => _MediaGridState();
 }
@@ -60,37 +69,48 @@ class _MediaGridState extends State<MediaGrid>
 
   @override
   Widget build(BuildContext context) {
-    final SelectedImagesBloc selectedImagesBloc =
-        BlocProvider.of<SelectedImagesBloc>(context);
     return DefaultTabController(
       length: _albumsList.length,
       child: Scaffold(
         appBar: AppBar(
-          leading: BlocBuilder<SelectedImagesBloc, List<AssetEntity>>(
-            builder: (context, images) {
-              return images.length > 0
-                  ? IconButton(
-                      onPressed: () {
-                        selectedImagesBloc.add(ClearSelected());
-                      },
-                      icon: Icon(EvaIcons.close))
-                  : IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: Icon(
-                        EvaIcons.arrowBackOutline,
-                      ),
+          leading: BlocBuilder<SelectedImagesBloc, SelectedImagesState>(
+            builder: (context, state) {
+              if (state is SelectedImages) {
+                return IconButton(
+                  onPressed: () {
+                    BlocProvider.of<SelectedImagesBloc>(context).add(
+                      ClearSelected(),
                     );
+                  },
+                  icon: Icon(EvaIcons.close),
+                );
+              }
+
+              return IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(
+                  EvaIcons.arrowBackOutline,
+                ),
+              );
             },
           ),
           backgroundColor: Colors.transparent,
           elevation: 0,
           iconTheme: IconThemeData(color: Colors.black),
-          title: BlocBuilder<SelectedImagesBloc, List<AssetEntity>>(
-            builder: (context, images) {
+          title: BlocBuilder<SelectedImagesBloc, SelectedImagesState>(
+            builder: (context, state) {
+              if (state is SelectedImages) {
+                return Text(
+                  "${state.selectedImages.length} selected",
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
+                );
+              }
               return Text(
-                images.length > 0 ? "${images.length} selected" : "Gallery",
+                "Gallery",
                 style: TextStyle(
                   color: Colors.black,
                 ),
@@ -98,53 +118,50 @@ class _MediaGridState extends State<MediaGrid>
             },
           ),
           actions: <Widget>[
-            BlocBuilder<SelectedImagesBloc, List<AssetEntity>>(
-                builder: (context, images) {
-              return images.length > 0
-                  ? FlatButton(
-                      onPressed: () {
-                        if (images.length > 10) {
-                          Scaffold.of(context).showSnackBar(
-                            SnackBar(
-                              behavior: SnackBarBehavior.floating,
-                              content: Row(
-                                children: <Widget>[
-                                  Icon(
-                                    EvaIcons.alertCircleOutline,
-                                    color: Colors.redAccent,
-                                  ),
-                                  SizedBox(width: 10.0),
-                                  Text("You can't select more than 10 images."),
-                                ],
+            BlocBuilder<SelectedImagesBloc, SelectedImagesState>(
+                builder: (context, state) {
+              if (state is SelectedImages) {
+                return FlatButton(
+                  onPressed: () {
+                    if (state.selectedImages.length > widget.maxSelect) {
+                      Scaffold.of(context).showSnackBar(
+                        SnackBar(
+                          behavior: SnackBarBehavior.floating,
+                          content: Row(
+                            children: <Widget>[
+                              Icon(
+                                EvaIcons.alertCircleOutline,
+                                color: Colors.redAccent,
                               ),
-                            ),
-                          );
-                        } else {
-                          Navigator.push(
-                            context,
-                            SlideLeftRoute(
-                              widget: PublishPage(selectedImages: images),
-                            ),
-                          );
-                        }
-                      },
-                      child: Text(
-                        "Next",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
+                              SizedBox(width: 10.0),
+                              Text(
+                                  "You can't select more than ${widget.maxSelect} images."),
+                            ],
+                          ),
                         ),
-                      ),
-                    )
-                  : IconButton(
-                      onPressed: () {
-                        print("camera");
-                      },
-                      icon: Icon(
-                        Icons.camera_alt,
-                        color: Color(0xff5f6368),
-                        semanticLabel: "Camera",
-                      ),
-                    );
+                      );
+                    } else {
+                      widget.callback();
+                    }
+                  },
+                  child: Text(
+                    "Next",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                );
+              }
+              return IconButton(
+                onPressed: () {
+                  print("camera");
+                },
+                icon: Icon(
+                  Icons.camera_alt,
+                  color: Color(0xff5f6368),
+                  semanticLabel: "Camera",
+                ),
+              );
             }),
           ],
           bottom: TabBar(
@@ -211,6 +228,12 @@ class _GridViewImagesState extends State<GridViewImages> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    _mediaList = [];
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GridView.builder(
       padding: EdgeInsets.all(5.0),
@@ -250,57 +273,70 @@ class SelectedOverlay extends StatefulWidget {
 class _SelectedOverlayState extends State<SelectedOverlay> {
   @override
   Widget build(BuildContext context) {
-    final SelectedImagesBloc selectedImagesBloc =
-        BlocProvider.of<SelectedImagesBloc>(context);
-
-    return BlocBuilder<SelectedImagesBloc, List<AssetEntity>>(
-      builder: (context, images) {
+    return BlocBuilder<SelectedImagesBloc, SelectedImagesState>(
+      builder: (context, state) {
         return Padding(
           padding: const EdgeInsets.all(3.0),
           child: InkWell(
-            onTap: () {
-              selectedImagesBloc.add(
-                SelectImage(widget.mediaList[widget.index]),
-              );
-            },
-            child: Stack(
-              fit: StackFit.expand,
-              children: <Widget>[
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(5.0),
-                  child: Image.memory(widget.data, fit: BoxFit.cover),
-                ),
-                images.contains(widget.mediaList[widget.index])
-                    ? Container(
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(254, 254, 254, 0.3),
-                          borderRadius: BorderRadius.circular(5.0),
-                        ),
-                        child: Center(
-                          child: Container(
-                            width: 30.0,
-                            height: 30.0,
-                            decoration: BoxDecoration(
-                              color: Colors.blueAccent,
-                              borderRadius: BorderRadius.circular(25.0),
-                            ),
-                            child: Center(
-                              child: Text(
-                                "${images.indexOf(widget.mediaList[widget.index]) + 1}",
-                                style: TextStyle(
-                                  letterSpacing: 0,
-                                  fontSize: 16.0,
-                                  color: Colors.white,
+              onTap: () {
+                if (state is SelectedImages) {
+                  final item = widget.mediaList[widget.index];
+                  List<AssetEntity> updatedList;
+                  if (state.selectedImages.contains(item)) {
+                    updatedList = List.from(state.selectedImages)..remove(item);
+                  } else {
+                    updatedList = List.from(state.selectedImages)..add(item);
+                  }
+
+                  BlocProvider.of<SelectedImagesBloc>(context).add(
+                    SelectImage(updatedList),
+                  );
+                } else {
+                  BlocProvider.of<SelectedImagesBloc>(context).add(
+                    SelectImage([widget.mediaList[widget.index]]),
+                  );
+                }
+              },
+              child: Stack(
+                fit: StackFit.expand,
+                children: <Widget>[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(5.0),
+                    child: Image.memory(widget.data, fit: BoxFit.cover),
+                  ),
+                  (state is SelectedImages)
+                      ? state.selectedImages
+                              .contains(widget.mediaList[widget.index])
+                          ? Container(
+                              decoration: BoxDecoration(
+                                color: Color.fromRGBO(254, 254, 254, 0.3),
+                                borderRadius: BorderRadius.circular(5.0),
+                              ),
+                              child: Center(
+                                child: Container(
+                                  width: 30.0,
+                                  height: 30.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.blueAccent,
+                                    borderRadius: BorderRadius.circular(25.0),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "${state.selectedImages.indexOf(widget.mediaList[widget.index]) + 1}",
+                                      style: TextStyle(
+                                        letterSpacing: 0,
+                                        fontSize: 16.0,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                        ),
-                      )
-                    : Container(),
-              ],
-            ),
-          ),
+                            )
+                          : Container()
+                      : SizedBox(),
+                ],
+              )),
         );
       },
     );

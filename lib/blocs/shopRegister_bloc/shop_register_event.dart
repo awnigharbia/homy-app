@@ -1,17 +1,19 @@
 import 'package:equatable/equatable.dart';
-
 import 'package:meta/meta.dart';
+import 'package:shop_repository/shop_repository.dart';
 
-abstract class RegisterShopEvent extends Equatable {
-  const RegisterShopEvent();
+abstract class ShopRegisterEvent extends Equatable {
+  const ShopRegisterEvent();
 
   @override
   List<Object> get props => [];
 }
 
-class Next extends RegisterShopEvent {}
+class Next extends ShopRegisterEvent {}
 
-class ShopNameChanged extends RegisterShopEvent {
+class Back extends ShopRegisterEvent {}
+
+class ShopNameChanged extends ShopRegisterEvent {
   final String shopName;
 
   ShopNameChanged({@required this.shopName});
@@ -23,7 +25,7 @@ class ShopNameChanged extends RegisterShopEvent {
   String toString() => 'ShopNameChanged to:{shopName: $shopName}';
 }
 
-class ShopPhoneChanged extends RegisterShopEvent {
+class ShopPhoneChanged extends ShopRegisterEvent {
   final String shopPhone;
 
   ShopPhoneChanged({@required this.shopPhone});
@@ -35,7 +37,7 @@ class ShopPhoneChanged extends RegisterShopEvent {
   String toString() => 'shopPhoneChanged to:{shopPhone: $shopPhone}';
 }
 
-class ShopDescriptionChanged extends RegisterShopEvent {
+class ShopDescriptionChanged extends ShopRegisterEvent {
   final String shopDescription;
 
   ShopDescriptionChanged({@required this.shopDescription});
@@ -48,7 +50,7 @@ class ShopDescriptionChanged extends RegisterShopEvent {
       'shopDescriptionChanged to:{shopDescription: $shopDescription}';
 }
 
-class ShopLocationChanged extends RegisterShopEvent {
+class ShopLocationChanged extends ShopRegisterEvent {
   final String shopLocation;
 
   ShopLocationChanged({@required this.shopLocation});
@@ -60,7 +62,7 @@ class ShopLocationChanged extends RegisterShopEvent {
   String toString() => 'shopLocationChanged to:{shopLocation: $shopLocation}';
 }
 
-class ShopTypeChanged extends RegisterShopEvent {
+class ShopTypeChanged extends ShopRegisterEvent {
   final String shopType;
 
   ShopTypeChanged({@required this.shopType});
@@ -72,27 +74,41 @@ class ShopTypeChanged extends RegisterShopEvent {
   String toString() => 'shopTypeChanged to:{shopType: $shopType}';
 }
 
-class Submitted extends RegisterShopEvent {
-  final String shopName;
-  final String shopLocation;
-  final String shopPhone;
-  final String shopDescripton;
-  final String shopType;
+class UpdateShop extends ShopRegisterEvent {
+  final Shop shop;
 
-  const Submitted({
+  UpdateShop({this.shop});
+
+  @override
+  List<Object> get props => [shop];
+
+  @override
+  String toString() => 'Updated shop:$shop';
+}
+
+class SaveShop extends ShopRegisterEvent {
+  final String shopName;
+  final String shopDescription;
+  final String shopPhone;
+  final String shopLocation;
+  final String shopType;
+  final String ownerId;
+
+  SaveShop({
     @required this.shopName,
-    @required this.shopLocation,
+    @required this.shopDescription,
     @required this.shopPhone,
-    @required this.shopDescripton,
+    @required this.shopLocation,
     @required this.shopType,
+    @required this.ownerId,
   });
 
   @override
   List<Object> get props =>
-      [shopName, shopLocation, shopPhone, shopDescripton, shopType];
+      [shopName, shopDescription, shopPhone, shopLocation, shopType, ownerId];
 
   @override
   String toString() {
-    return 'Submitted { shopName: $shopName, shopDescripton: $shopDescripton, shopLocation: $shopLocation, shopPhone: $shopPhone, shopType: $shopType }';
+    return 'Submitted { shopName: $shopName, shopDescripton: $shopDescription, shopLocation: $shopLocation, shopPhone: $shopPhone, shopType: $shopType, ownerId:$ownerId }';
   }
 }

@@ -1,50 +1,44 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_firestore_todos/blocs/authentication_bloc/bloc.dart';
+import 'package:flutter_firestore_todos/blocs/product_bloc/product_bloc.dart';
 import 'package:flutter_firestore_todos/widgets/widgets.dart';
+import 'package:shop_repository/shop_repository.dart';
 
 class MyShopHomeTab extends StatelessWidget {
   const MyShopHomeTab({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
+        builder: (context, state) {
+      if (state is Authenticated)
+        return BlocProvider<ProductBloc>(
+          create: (context) => ProductBloc(
+            shopRepository: FirebaseShopRepository(),
+          )..add(
+              LoadProduct(uid: state.user.id),
+            ),
+          child: MyShopHomeTabProvided(shop: state.shop, uid: state.user.id),
+        );
+
+      return SizedBox();
+    });
+  }
+}
+
+class MyShopHomeTabProvided extends StatelessWidget {
+  final Shop shop;
+  final String uid;
+  const MyShopHomeTabProvided({Key key, this.shop, this.uid}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return SliverList(
       delegate: SliverChildListDelegate(
         [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: RichText(
-              text: TextSpan(children: <TextSpan>[
-                TextSpan(
-                  text: "300 ",
-                  style: TextStyle(
-                      fontSize: 16.0,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
-                ),
-                TextSpan(
-                  text: "posts          ",
-                  style: TextStyle(
-                      fontSize: 14.0,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.normal),
-                ),
-                TextSpan(
-                  text: "3k ",
-                  style: TextStyle(
-                      fontSize: 16.0,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
-                ),
-                TextSpan(
-                  text: "people following your shop",
-                  style: TextStyle(
-                      fontSize: 14.0,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.normal),
-                )
-              ]),
-            ),
-          ),
+          MyShopHomeFollowers(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: FlatButton(
@@ -102,28 +96,32 @@ class MyShopHomeTab extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
             ),
           ),
-          Container(
-            padding: const EdgeInsets.only(left: 14.0, top: 16.0, right: 14.0),
-            child: Column(
-              children: <Widget>[
-                MyShopPost(
-                  isCollection: false,
-                  image:
-                      "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=375&q=80",
-                ),
-                MyShopPost(
-                  isCollection: true,
-                  image:
-                      "https://images.unsplash.com/photo-1531310197839-ccf54634509e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=401&q=80",
-                ),
-                MyShopPost(
-                  isCollection: false,
-                  image:
-                      "https://images.unsplash.com/photo-1532471965572-092fb677a6a1?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80",
-                ),
-              ],
-            ),
-          )
+          BlocBuilder<ProductBloc, ProductState>(
+            builder: (context, state) {
+              if (state is ProductLoaded) {
+                return Container(
+                  padding:
+                      const EdgeInsets.only(left: 14.0, top: 16.0, right: 14.0),
+                  child: Column(
+                    children: state.products
+                        .map(
+                          (e) => MyShopPost(
+                            uid: uid,
+                            product: e,
+                            shopName: shop.shopName,
+                            shopType: shop.shopType,
+                          ),
+                        )
+                        .toList(),
+                  ),
+                );
+              }
+
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            },
+          ),
         ],
       ),
     );

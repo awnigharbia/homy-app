@@ -3,19 +3,25 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:user_repository/src/firestore_service.dart';
-import 'package:user_repository/src/user.dart';
+import 'package:user_repository/src/models/user.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class UserRepository {
   final FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
+  final FacebookAuth _facebookAuth;
   final FirestoreService _firestoreService = FirestoreService();
 
   User _currentUser;
   User get currentUser => _currentUser;
 
-  UserRepository({FirebaseAuth firebaseAuth, GoogleSignIn googleSignin})
+  UserRepository(
+      {FirebaseAuth firebaseAuth,
+      GoogleSignIn googleSignin,
+      FacebookAuth facebookAuth})
       : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-        _googleSignIn = googleSignin ?? GoogleSignIn();
+        _googleSignIn = googleSignin ?? GoogleSignIn(),
+        _facebookAuth = facebookAuth ?? FacebookAuth.instance;
 
   Future<FirebaseUser> signInWithGoogle() async {
     try {
@@ -34,12 +40,69 @@ class UserRepository {
     }
   }
 
+  Future<FirebaseUser> signInWithFacebook() async {
+    String _token;
+    print(_token);
+    // try {
+    await _facebookAuth.login();
+    final userData = await FacebookAuth.instance.getUserData();
+    print(userData);
+    AuthCredential credential =
+        FacebookAuthProvider.getCredential(accessToken: _token);
+    final FirebaseUser user =
+        (await _firebaseAuth.signInWithCredential(credential)).user;
+    print(user);
+    // if (result.status == FacebookAuthLoginResponse.ok) {
+    //   final user = await _firebaseAuth.currentUser();
+    //   print(user.email);
+    //   return user;
+    // } else if (result.status == FacebookAuthLoginResponse.error) {
+    //   return null;
+    // } else if (result.status == FacebookAuthLoginResponse.cancelled) {
+    //   return null;
+    // }
+
+    return null;
+    // } catch (e) {
+    //   throw new Error();
+    // }
+  }
+
   Future<void> signInWithCredentials(String email, String password) {
     return _firebaseAuth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
   }
+
+  Future updateUserEmail(User updatedUser) async {
+    try {
+      final FirebaseUser user = await _firebaseAuth.currentUser();
+      user.updateEmail(updatedUser.email);
+
+      _firestoreService.updateUser(updatedUser);
+    } catch (e) {
+      throw new Error();
+    }
+  }
+
+  Future updateUserPassword(String password) async {
+    try {
+      final FirebaseUser user = await _firebaseAuth.currentUser();
+      user.updatePassword(password);
+    } catch (e) {}
+  }
+
+  Future updateUserData(User user) async {
+    _firestoreService.updateUser(user);
+  }
+
+  Future deleteAccount() async {
+    final FirebaseUser user = await _firebaseAuth.currentUser();
+    user.delete();
+  }
+
+ 
 
   Future saveUser({
     @required String email,
@@ -95,6 +158,7 @@ class UserRepository {
     return Future.wait([
       _firebaseAuth.signOut(),
       _googleSignIn.signOut(),
+      FacebookAuth.instance.logOut(),
     ]);
   }
 
@@ -108,19 +172,13 @@ class UserRepository {
   }
 
   Future<String> getEmail() async {
-    final email = await _firebaseAuth.currentUser();
+    final user = await _firebaseAuth.currentUser();
 
-    return email.email;
+    return user.email;
   }
 
-  Future<void> getUser() async {
+  Future<User> getUser() async {
     var user = await _firebaseAuth.currentUser();
-    _currentUser = await _firestoreService.getUser(user.uid);
-  }
-
-  bool isTraderHaveShop() {
-    return _currentUser.userRole == 'Trader' && _currentUser.shopId != null
-        ? _currentUser.shopId.isNotEmpty
-        : false;
+    return _currentUser = await _firestoreService.getUser(user.uid);
   }
 }

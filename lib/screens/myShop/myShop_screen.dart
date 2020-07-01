@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_firestore_todos/widgets/widgets.dart';
 
+
 class MyShopScreen extends StatelessWidget {
   Widget wrapper({page}) {
     return SafeArea(
@@ -38,7 +39,9 @@ class MyShopScreen extends StatelessWidget {
             ];
           },
           body: TabBarView(children: [
-            wrapper(page: MyShopHomeTab()),
+            wrapper(
+              page: MyShopHomeTab(),
+            ),
             MyShopCollections(),
             wrapper(page: MyShopCategories()),
             wrapper(page: MyShopInfo()),

@@ -11,6 +11,7 @@ class ShopRegisterState {
   final bool isSuccess;
   final bool isNext;
   final bool isFailure;
+  final bool isUpdateSuccess;
 
   bool get isFormValid =>
       isShopNameValid &&
@@ -28,19 +29,21 @@ class ShopRegisterState {
     @required this.isSuccess,
     @required this.isFailure,
     @required this.isNext,
+    @required this.isUpdateSuccess,
   });
 
   factory ShopRegisterState.empty() {
     return ShopRegisterState(
-      isShopNameValid: true,
-      isShopPhoneValid: true,
-      isShopLocationValid: true,
-      isShopDescriptionValid: true,
-      isShopTypeValid: true,
+      isShopNameValid: false,
+      isShopPhoneValid: false,
+      isShopLocationValid: false,
+      isShopDescriptionValid: false,
+      isShopTypeValid: false,
       isSubmitting: false,
       isSuccess: false,
       isFailure: false,
       isNext: false,
+      isUpdateSuccess: false,
     );
   }
 
@@ -55,6 +58,7 @@ class ShopRegisterState {
       isSuccess: false,
       isFailure: false,
       isNext: false,
+      isUpdateSuccess: false,
     );
   }
 
@@ -69,6 +73,22 @@ class ShopRegisterState {
       isSuccess: false,
       isFailure: true,
       isNext: false,
+      isUpdateSuccess: false,
+    );
+  }
+
+  factory ShopRegisterState.next() {
+    return ShopRegisterState(
+      isShopNameValid: true,
+      isShopPhoneValid: true,
+      isShopLocationValid: true,
+      isShopDescriptionValid: true,
+      isShopTypeValid: false,
+      isSubmitting: false,
+      isSuccess: false,
+      isFailure: false,
+      isNext: true,
+      isUpdateSuccess: false,
     );
   }
 
@@ -83,6 +103,22 @@ class ShopRegisterState {
       isSuccess: true,
       isFailure: false,
       isNext: false,
+      isUpdateSuccess: false,
+    );
+  }
+
+  factory ShopRegisterState.updateSuccess() {
+    return ShopRegisterState(
+      isShopNameValid: true,
+      isShopPhoneValid: true,
+      isShopLocationValid: true,
+      isShopDescriptionValid: true,
+      isShopTypeValid: true,
+      isSubmitting: false,
+      isSuccess: true,
+      isFailure: false,
+      isNext: false,
+      isUpdateSuccess: true,
     );
   }
 
@@ -90,7 +126,7 @@ class ShopRegisterState {
       {bool isShopNameValid,
       bool isShopPhoneValid,
       bool isShopLocationValid,
-      bool isUserRoleValid,
+      bool isShopDescriptionValid,
       bool isShopTypeValid}) {
     return copyWith(
       isShopNameValid: isShopNameValid,
@@ -105,17 +141,17 @@ class ShopRegisterState {
     );
   }
 
-  ShopRegisterState copyWith({
-    bool isShopNameValid,
-    bool isShopPhoneValid,
-    bool isShopLocationValid,
-    bool isShopDescriptionValid,
-    bool isShopTypeValid,
-    bool isSuccess,
-    bool isFailure,
-    bool isNext,
-    bool isSubmitting,
-  }) {
+  ShopRegisterState copyWith(
+      {bool isShopNameValid,
+      bool isShopPhoneValid,
+      bool isShopLocationValid,
+      bool isShopDescriptionValid,
+      bool isShopTypeValid,
+      bool isSuccess,
+      bool isFailure,
+      bool isNext,
+      bool isSubmitting,
+      bool isUpdateSuccess}) {
     return ShopRegisterState(
       isShopNameValid: isShopNameValid ?? this.isShopNameValid,
       isShopPhoneValid: isShopPhoneValid ?? this.isShopPhoneValid,
@@ -127,6 +163,7 @@ class ShopRegisterState {
       isSuccess: isSuccess ?? this.isSuccess,
       isFailure: isFailure ?? this.isFailure,
       isNext: isNext ?? this.isNext,
+      isUpdateSuccess: isUpdateSuccess ?? this.isUpdateSuccess,
     );
   }
 
@@ -141,7 +178,8 @@ class ShopRegisterState {
       isSubmitting: $isSubmitting,
       isSuccess: $isSuccess,
       isFailure: $isFailure,
-      isNext: $isNext
+      isNext: $isNext,
+      isUpdateSuccess: $isUpdateSuccess,
     }''';
   }
 }

@@ -7,3 +7,5 @@ export './login_bloc/bloc.dart';
 export './onboard_bloc/bloc.dart';
 export './register_bloc/register.dart';
 export './authentication_bloc/bloc.dart';
+export './uploadImage_bloc/upload_image_bloc.dart';
+export './imagePicker_bloc/bloc.dart';

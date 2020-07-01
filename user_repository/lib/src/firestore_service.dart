@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:user_repository/src/user.dart';
+import 'package:user_repository/src/models/user.dart';
 
 class FirestoreService {
   final CollectionReference _usersCollectionReference =
@@ -7,7 +7,9 @@ class FirestoreService {
 
   Future createUser(User user) async {
     try {
-      await _usersCollectionReference.document(user.id).setData(user.toJson());
+      await _usersCollectionReference
+          .document(user.id)
+          .setData(user.toEntity().toDocument());
     } catch (e) {
       return e.message;
     }
@@ -20,5 +22,12 @@ class FirestoreService {
     } catch (e) {
       return e.message;
     }
+  }
+
+
+  Future updateUser(User updatedUser) async {
+    return _usersCollectionReference
+        .document(updatedUser.id)
+        .updateData(updatedUser.toEntity().toDocument());
   }
 }

@@ -83,6 +83,8 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
   Stream<RegisterState> _mapRegisterWithGoogleToState() async* {
     try {
       await _userRepository.signInWithGoogle();
+      // final result = await _userRepository.signInWithFacebook();
+      // print(result);
       yield RegisterState.notComplete();
     } catch (_) {
       yield RegisterState.failure();

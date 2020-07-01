@@ -10,19 +10,16 @@ class OnBoardingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: BlocBuilder<OnBoardBloc, MyState>(
-        builder: (_, state) {
-          if (state is OnBoardPage) {
-            return Onboarding();
-          } else if (state is LoginPage) {
-            return LoginScreen();
-          } else if (state is RegisterPage) {
-            return SignupScreen();
-          }
-        },
-      ),
+    return BlocBuilder<OnBoardBloc, MyState>(
+      builder: (_, state) {
+        if (state is OnBoardPage) {
+          return Onboarding();
+        } else if (state is LoginPage) {
+          return LoginScreen();
+        } else if (state is RegisterPage) {
+          return SignupScreen();
+        }
+      },
     );
   }
 }

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_firestore_todos/blocs/blocs.dart';
-import 'package:flutter_firestore_todos/screens/screens.dart';
-import 'package:flutter_firestore_todos/widgets/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class IntroButton extends StatelessWidget {
@@ -32,8 +30,6 @@ class IntroButton extends StatelessWidget {
               color: Color.fromRGBO(235, 87, 87, 1),
               onPressed: () {
                 BlocProvider.of<OnBoardBloc>(context).add(MyEvent.RegisterPage);
-                // Navigator.of(context)
-                //     .push(SlideLeftRoute(widget: SignupScreen()));
               },
               child: Text(
                 "Register",

@@ -1,6 +1,7 @@
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firestore_todos/screens/screens.dart';
+import 'package:flutter_firestore_todos/widgets/utils/slideLeftRoute.dart';
 
 final List<Widget> customerScreens = <Widget>[
   WallScreen(),
@@ -45,7 +46,18 @@ class _HomeNavigationState extends State<HomeNavigation> {
           child: FloatingActionButton(
             shape: StadiumBorder(),
             onPressed: () {
-              Navigator.of(context).pushNamed("/imagePicker");
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => ImagePick(
+                        maxSelect: 10,
+                        callback: () {
+                          Navigator.push(
+                            context,
+                            SlideLeftRoute(
+                              widget: PublishPage(),
+                            ),
+                          );
+                        },
+                      )));
             },
             backgroundColor: Colors.redAccent,
             child: Icon(
