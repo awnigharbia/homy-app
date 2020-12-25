@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_firestore_todos/blocs/authentication_bloc/bloc.dart';
 import 'package:user_repository/user_repository.dart';
 
 abstract class AuthenticationEvent extends Equatable {

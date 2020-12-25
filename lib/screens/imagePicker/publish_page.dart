@@ -97,6 +97,16 @@ class _PublishPageProvidedState extends State<PublishPageProvided> {
                 return SizedBox();
               });
             }
+
+            return FlatButton(
+              onPressed: null,
+              child: Text(
+                "Post",
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            );
           })
         ],
       ),
