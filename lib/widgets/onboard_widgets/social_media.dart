@@ -21,72 +21,74 @@ class SocialMediaLink extends StatelessWidget {
         curve: Curves.fastOutSlowIn,
         padding: EdgeInsets.symmetric(vertical: 16.0),
         child: Column(
-          mainAxisSize: MainAxisSize.max,
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: 50.0,
-              child: FlatButton(
-                color: Color.fromRGBO(64, 100, 172, 1),
-                onPressed: () {
-                  print("Facebook");
-                },
-                child: Text(
-                  "Facebook",
-                  style: GoogleFonts.openSans(
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                    fontSize: 16.0,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 10.0,
-            ),
-            Row(mainAxisSize: MainAxisSize.max, children: <Widget>[
-              Expanded(
-                flex: 5,
-                child: SizedBox(
-                  height: 50.0,
-                  child: FlatButton(
-                    color: Color.fromRGBO(52, 209, 247, 1),
-                    onPressed: () {
-                      print("Facebook");
-                    },
-                    child: Text(
-                      "Twitter",
-                      style: GoogleFonts.openSans(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        fontSize: 16.0,
-                      ),
+            Expanded(
+              flex: 9,
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width,
+                height: 50.0,
+                child: FlatButton(
+                  color: Color.fromRGBO(64, 100, 172, 1),
+                  onPressed: () {
+                    print("Facebook");
+                  },
+                  child: Text(
+                    "Facebook",
+                    style: GoogleFonts.openSans(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                      fontSize: 16.0,
                     ),
                   ),
                 ),
               ),
-              SizedBox(
-                width: 10.0,
-              ),
-              Expanded(
-                flex: 5,
-                child: SizedBox(
-                  height: 50.0,
-                  child: FlatButton(
-                    color: Color.fromRGBO(212, 66, 53, 1),
-                    onPressed: googleCallback,
-                    child: Text(
-                      "Google",
-                      style: GoogleFonts.openSans(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        fontSize: 16.0,
+            ),
+            Spacer(flex: 1),
+            Expanded(
+              flex: 9,
+              child: Row(children: <Widget>[
+                Expanded(
+                  child: SizedBox(
+                    height: 50.0,
+                    child: FlatButton(
+                      color: Color.fromRGBO(52, 209, 247, 1),
+                      onPressed: () {
+                        print("Facebook");
+                      },
+                      child: Text(
+                        "Twitter",
+                        style: GoogleFonts.openSans(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          fontSize: 16.0,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ]),
+                SizedBox(
+                  width: 10.0,
+                ),
+                Expanded(
+                  child: SizedBox(
+                    height: 50.0,
+                    child: FlatButton(
+                      color: Color.fromRGBO(212, 66, 53, 1),
+                      onPressed: googleCallback,
+                      child: Text(
+                        "Google",
+                        style: GoogleFonts.openSans(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          fontSize: 16.0,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ]),
+            ),
           ],
         ),
       ),

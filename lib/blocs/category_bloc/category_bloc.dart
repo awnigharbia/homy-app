@@ -11,10 +11,8 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
 
   CategoryBloc({@required CategoryRepository categoryRepository})
       : assert(categoryRepository != null),
-        _categoryRepository = categoryRepository;
-
-  @override
-  CategoryState get initialState => CategoryLoading();
+        _categoryRepository = categoryRepository,
+        super(CategoryLoading());
 
   @override
   Stream<CategoryState> mapEventToState(

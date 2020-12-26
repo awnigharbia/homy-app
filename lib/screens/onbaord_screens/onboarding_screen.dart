@@ -12,13 +12,12 @@ class OnBoardingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<OnBoardBloc, MyState>(
       builder: (_, state) {
-        if (state is OnBoardPage) {
-          return Onboarding();
-        } else if (state is LoginPage) {
+        if (state is LoginPage) {
           return LoginScreen();
         } else if (state is RegisterPage) {
           return SignupScreen();
         }
+        return Onboarding();
       },
     );
   }

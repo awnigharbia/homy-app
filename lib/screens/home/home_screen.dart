@@ -7,7 +7,7 @@ import 'package:flutter_firestore_todos/widgets/widgets.dart';
 import 'package:user_repository/user_repository.dart';
 
 class HomeScreen extends StatefulWidget {
-  final User user;
+  final UserModel user;
   HomeScreen({Key key, @required this.user}) : super(key: key);
 
   @override
@@ -22,22 +22,22 @@ class _HomeScreenState extends State<HomeScreen>
     BottomNavigationBarItem(
       icon: Icon(EvaIcons.homeOutline),
       activeIcon: Icon(EvaIcons.home),
-      title: Text("Home"),
+      label: "Home",
     ),
     BottomNavigationBarItem(
       icon: Icon(EvaIcons.compassOutline),
       activeIcon: Icon(EvaIcons.compass),
-      title: Text("Explore"),
+      label: "Explore",
     ),
     BottomNavigationBarItem(
       icon: Icon(EvaIcons.shoppingBagOutline),
       activeIcon: Icon(EvaIcons.shoppingBag),
-      title: Text("Subscriptions"),
+      label: "Subscriptions",
     ),
     BottomNavigationBarItem(
       icon: Icon(EvaIcons.bellOutline),
       activeIcon: Icon(EvaIcons.bell),
-      title: Text("Notifications"),
+      label: "Notifications",
     ),
   ];
 
@@ -47,21 +47,21 @@ class _HomeScreenState extends State<HomeScreen>
     BottomNavigationBarItem(
       icon: Icon(EvaIcons.homeOutline),
       activeIcon: Icon(EvaIcons.home),
-      title: Text("Home"),
+      label: "Home",
     ),
     BottomNavigationBarItem(
       icon: Icon(EvaIcons.compassOutline),
       activeIcon: Icon(EvaIcons.compass),
-      title: Text("Explore"),
+      label: "Explore",
     ),
     BottomNavigationBarItem(
       icon: Icon(EvaIcons.bellOutline),
       activeIcon: Icon(EvaIcons.bell),
-      title: Text("Notifications"),
+      label: "Notifications",
     ),
     BottomNavigationBarItem(
       icon: Icon(Icons.store),
-      title: Text("My Shop"),
+      label: "My Shop",
     ),
   ];
 
@@ -100,6 +100,9 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             );
           }
+
+          // TODO1: Handle unauthenticated scene
+          return Text("Not Authenticated");
         }),
       ),
     );

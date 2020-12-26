@@ -15,10 +15,8 @@ class AuthenticationBloc
       @required FirebaseShopRepository shopRepository})
       : assert(userRepository != null, shopRepository != null),
         _userRepository = userRepository,
-        _shopRepository = shopRepository;
-
-  @override
-  AuthenticationState get initialState => Uninitialized();
+        _shopRepository = shopRepository,
+        super(Uninitialized());
 
   @override
   Stream<AuthenticationState> mapEventToState(
@@ -65,7 +63,7 @@ class AuthenticationBloc
     }
   }
 
-  Stream<AuthenticationState> _mapUpdateUserToState(User user) async* {
+  Stream<AuthenticationState> _mapUpdateUserToState(UserModel user) async* {
     await _userRepository.updateUserData(user);
   }
 
@@ -74,7 +72,7 @@ class AuthenticationBloc
     await _userRepository.updateUserPassword(password);
   }
 
-  Stream<AuthenticationState> _mapUpdateEmailToState(User user) async* {
+  Stream<AuthenticationState> _mapUpdateEmailToState(UserModel user) async* {
     await _userRepository.updateUserEmail(user);
   }
 

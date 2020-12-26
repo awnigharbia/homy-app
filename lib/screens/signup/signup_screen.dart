@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_firestore_todos/blocs/authentication_bloc/bloc.dart';
 import 'package:flutter_firestore_todos/blocs/blocs.dart';
 import 'package:flutter_firestore_todos/blocs/register_bloc/register.dart';
-import 'package:flutter_firestore_todos/screens/screens.dart';
 import 'package:flutter_firestore_todos/widgets/widgets.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_svg/flutter_svg.dart';

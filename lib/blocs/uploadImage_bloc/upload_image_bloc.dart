@@ -1,8 +1,8 @@
 import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:photo_manager/photo_manager.dart';
 import 'package:shop_repository/shop_repository.dart';
 
 part 'upload_image_event.dart';
@@ -13,10 +13,8 @@ class UploadImageBloc extends Bloc<UploadImageEvent, UploadImageState> {
 
   UploadImageBloc({@required ShopRepository shopRepository})
       : assert(shopRepository != null),
-        _shopRepository = shopRepository;
-
-  @override
-  UploadImageState get initialState => UploadImageInitial();
+        _shopRepository = shopRepository,
+        super(UploadImageInitial());
 
   @override
   Stream<UploadImageState> mapEventToState(

@@ -13,10 +13,8 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
   ProductBloc({@required ShopRepository shopRepository})
       : assert(shopRepository != null),
-        _shopRepository = shopRepository;
-
-  @override
-  ProductState get initialState => ProductLoading();
+        _shopRepository = shopRepository,
+        super(ProductLoading());
 
   @override
   Stream<ProductState> mapEventToState(

@@ -1,21 +1,19 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:shop_repository/shop_repository.dart';
-import 'package:todos_repository/todos_repository.dart';
-import 'package:user_repository/user_repository.dart';
-
 import 'package:flutter_firestore_todos/blocs/authentication_bloc/bloc.dart';
 import 'package:flutter_firestore_todos/blocs/blocs.dart';
 import 'package:flutter_firestore_todos/blocs/shopRegister_bloc/shop_register_bloc.dart';
 import 'package:flutter_firestore_todos/screens/screens.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:shop_repository/shop_repository.dart';
+import 'package:user_repository/user_repository.dart';
 
 import 'blocs/create_shop_bloc/bloc.dart';
 import 'blocs/imagePicker_bloc/selectedImages_bloc.dart';
 
 void main() {
-  BlocSupervisor.delegate = SimpleBlocDelegate();
+  Bloc.observer = SimpleBlocDelegate();
   runApp(MyApp());
 }
 
@@ -108,42 +106,9 @@ class MyApp extends StatelessWidget {
                     child: OnBoardingScreen(),
                   );
                 }
-                // return HomeScreen();
-                // return MultiBlocProvider(
-                //   providers: [
-                //     BlocProvider<TabBloc>(
-                //       create: (context) => TabBloc(),
-                //     ),
-                //     BlocProvider<FilteredTodosBloc>(
-                //       create: (context) => FilteredTodosBloc(
-                //         todosBloc: BlocProvider.of<TodosBloc>(context),
-                //       ),
-                //     ),
-                //     BlocProvider<StatsBloc>(
-                //       create: (context) => StatsBloc(
-                //         todosBloc: BlocProvider.of<TodosBloc>(context),
-                //       ),
-                //     ),
-                //   ],
-                //   child: HomeScreen1(),
-                // );
-                // }
-                // if (state is Unauthenticated) {
-                //   return OnboardingScreen();
-                // }
 
                 return SplashScreen();
               },
-            );
-          },
-          '/addTodo': (context) {
-            return AddEditScreen(
-              onSave: (task, note) {
-                BlocProvider.of<TodosBloc>(context).add(
-                  AddTodo(Todo(task, note: note)),
-                );
-              },
-              isEditing: false,
             );
           },
         },

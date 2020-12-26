@@ -31,7 +31,7 @@ class UserEntity extends Equatable {
 
   Map<String, Object> toDocument() {
     return {
-      "id":id,
+      "id": id,
       "username": username,
       "email": email,
       "userRole": userRole,
@@ -41,11 +41,11 @@ class UserEntity extends Equatable {
 
   static UserEntity fromSnapshot(DocumentSnapshot snap) {
     return UserEntity(
-      snap.documentID,
-      snap.data['username'],
-      snap.data['email'],
-      snap.data['userRole'],
-      snap.data['subscriptions'],
+      snap.id,
+      snap.data()['username'],
+      snap.data()['email'],
+      snap.data()['userRole'],
+      snap.data()['subscriptions'],
     );
   }
 

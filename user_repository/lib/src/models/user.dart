@@ -1,13 +1,13 @@
 import 'package:user_repository/src/entities/user_entity.dart';
 
-class User {
+class UserModel {
   final String id;
   final String username;
   final String email;
   final String userRole;
   final List<String> subscriptions;
 
-  User({
+  UserModel({
     String id,
     this.username,
     this.email,
@@ -15,13 +15,13 @@ class User {
     this.subscriptions,
   }) : this.id = id;
 
-  User copyWith(
+  UserModel copyWith(
       {String id,
       String username,
       String email,
       String userRole,
       List<String> subscriptions}) {
-    return User(
+    return UserModel(
       id: id ?? this.id,
       username: username ?? this.username,
       email: email ?? this.email,
@@ -41,7 +41,7 @@ class User {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is User &&
+      other is UserModel &&
           runtimeType == other.runtimeType &&
           username == other.username &&
           email == other.email &&
@@ -49,7 +49,7 @@ class User {
           subscriptions == other.subscriptions &&
           id == other.id;
 
-  User.fromData(Map<String, dynamic> data)
+  UserModel.fromData(Map<String, dynamic> data)
       : id = data['id'],
         username = data['username'],
         email = data['email'],
@@ -64,8 +64,8 @@ class User {
     return UserEntity(id, username, email, userRole, subscriptions);
   }
 
-  static User fromEntity(UserEntity entity) {
-    return User(
+  static UserModel fromEntity(UserEntity entity) {
+    return UserModel(
       id: entity.id,
       username: entity.username,
       email: entity.email,

@@ -84,8 +84,9 @@ class _SettingsUsernameState extends State<SettingsUsername> {
                       },
                       controller: _usernameController,
                       autofocus: true,
-                      decoration:
-                          InputDecoration(hintText: state.user.username, labelText: "Edit username"),
+                      decoration: InputDecoration(
+                          hintText: state.user.username,
+                          labelText: "Edit username"),
                     ),
                     SizedBox(
                       height: 20.0,

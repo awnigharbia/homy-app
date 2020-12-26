@@ -12,7 +12,7 @@ abstract class AuthenticationState extends Equatable {
 class Uninitialized extends AuthenticationState {}
 
 class Authenticated extends AuthenticationState {
-  final User user;
+  final UserModel user;
   final Shop shop;
 
   const Authenticated(this.user, this.shop);

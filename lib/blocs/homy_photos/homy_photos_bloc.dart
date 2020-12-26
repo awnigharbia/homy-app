@@ -9,10 +9,8 @@ class HomyPhotosBloc extends Bloc<HomyPhotosEvent, HomyPhotosState> {
 
   HomyPhotosBloc({@required ShopRepository shopRepository})
       : assert(shopRepository != null),
-        _shopRepository = shopRepository;
-
-  @override
-  HomyPhotosState get initialState => HomyPhotosLoading();
+        _shopRepository = shopRepository,
+        super(HomyPhotosLoading());
 
   @override
   Stream<HomyPhotosState> mapEventToState(HomyPhotosEvent event) async* {

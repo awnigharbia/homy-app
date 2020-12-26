@@ -55,6 +55,11 @@ class _SettingsEmailState extends State<SettingsEmail> {
                 },
               );
             }
+
+            return IconButton(
+              icon: Icon(EvaIcons.checkmark),
+              onPressed: null,
+            );
           }),
           SizedBox(
             width: 10,

@@ -7,8 +7,7 @@ enum MyEvent {
 }
 
 class CreateShopBloc extends Bloc<MyEvent, MyState> {
-  @override
-  MyState get initialState => ShopRegisterInfo();
+  CreateShopBloc() : super(ShopRegisterInfo());
 
   @override
   Stream<MyState> mapEventToState(MyEvent event) async* {

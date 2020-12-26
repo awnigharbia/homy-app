@@ -2,12 +2,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_firestore_todos/blocs/imagePicker_bloc/selectedImages_events.dart';
 import 'package:flutter_firestore_todos/blocs/imagePicker_bloc/selectedImages_state.dart';
 
-
-
 class SelectedImagesBloc
     extends Bloc<SelectedImagesEvent, SelectedImagesState> {
-  @override
-  SelectedImagesState get initialState => InitialSelectedImages();
+  SelectedImagesBloc() : super(InitialSelectedImages());
 
   @override
   Stream<SelectedImagesState> mapEventToState(
