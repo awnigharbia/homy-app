@@ -86,15 +86,15 @@ class ProductEntity extends Equatable {
     if (snap.data == null) return null;
 
     return ProductEntity(
-      id: snap.documentID,
-      description: snap.data['description'],
-      category: snap.data['category'],
-      photos: snap.data['photos'],
-      sizes: snap.data['sizes'],
-      price: snap.data['price'],
-      offerPrice: snap.data['offerPrice'],
-      inStock: snap.data['inStock'],
-      authorId: snap.data['authorId'],
+      id: snap.id,
+      description: snap.data()['description'],
+      category: snap.data()['category'],
+      photos: snap.data()['photos'],
+      sizes: snap.data()['sizes'],
+      price: snap.data()['price'],
+      offerPrice: snap.data()['offerPrice'],
+      inStock: snap.data()['inStock'],
+      authorId: snap.data()['authorId'],
     );
   }
 

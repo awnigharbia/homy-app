@@ -5,8 +5,6 @@ export './explore_widgets/explore_header.dart';
 export './explore_widgets/explore_item_info.dart';
 export './explore_widgets/photo_hero.dart';
 export './extra_actions.dart';
-export './filter_button.dart';
-export './filtered_todos.dart';
 export './home_widgets/drawer.dart';
 export './home_widgets/home_navigation.dart';
 export './image_picker_widgets/photo_hero.dart';

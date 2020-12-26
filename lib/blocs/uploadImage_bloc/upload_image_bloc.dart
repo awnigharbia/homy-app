@@ -13,10 +13,8 @@ class UploadImageBloc extends Bloc<UploadImageEvent, UploadImageState> {
 
   UploadImageBloc({@required ShopRepository shopRepository})
       : assert(shopRepository != null),
-        _shopRepository = shopRepository;
-
-  @override
-  UploadImageState get initialState => UploadImageInitial();
+        _shopRepository = shopRepository,
+        super(UploadImageInitial());
 
   @override
   Stream<UploadImageState> mapEventToState(

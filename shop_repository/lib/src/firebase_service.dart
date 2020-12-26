@@ -9,9 +9,9 @@ import 'package:shop_repository/shop_repository.dart';
 import 'package:shop_repository/src/entities/entities.dart';
 
 class FirebaseShopRepository implements ShopRepository {
-  final shopCollection = Firestore.instance.collection('shops');
-  final productCollection = Firestore.instance.collection('product');
-  final collectionRef = Firestore.instance.collection('collection');
+  final shopCollection = FirebaseFirestore.instance.collection('shops');
+  final productCollection = FirebaseFirestore.instance.collection('product');
+  final collectionRef = FirebaseFirestore.instance.collection('collection');
 
   @override
   Future<void> createNewShop(Shop shop) {
@@ -20,30 +20,27 @@ class FirebaseShopRepository implements ShopRepository {
 
   @override
   Future<bool> isShopOwner(String uid) async {
-    final result =
-        await shopCollection.where("ownerId", isEqualTo: uid).getDocuments();
+    final result = await shopCollection.where("ownerId", isEqualTo: uid).get();
 
     return result.documents.length != 0;
   }
 
   Future<List<Shop>> getShopInfo(String uid) async {
-    final result =
-        await shopCollection.where("ownerId", isEqualTo: uid).getDocuments();
+    final result = await shopCollection.where("ownerId", isEqualTo: uid).get();
 
     return uid != null
-        ? result.documents
+        ? result.docs
             .map((e) => Shop.fromEntity(ShopEntity.fromSnapshot(e)))
             .toList()
         : null;
   }
 
   Future<List<Product>> getShopProduct(String uid) async {
-    final result = await productCollection
-        .where("authorId", isEqualTo: uid)
-        .getDocuments();
+    final result =
+        await productCollection.where("authorId", isEqualTo: uid).get();
 
     return uid != null
-        ? result.documents
+        ? result.docs
             .map((e) => Product.fromEntity(ProductEntity.fromSnapshot(e)))
             .toList()
         : null;
@@ -65,16 +62,14 @@ class FirebaseShopRepository implements ShopRepository {
 
   @override
   Future<void> updateShop(Shop update) {
-    return shopCollection
-        .document(update.id)
-        .updateData(update.toEntity().toDocument());
+    return shopCollection.doc(update.id).update(update.toEntity().toDocument());
   }
 
   @override
   Future<void> editShopProduct(Product product) {
     return productCollection
-        .document(product.id)
-        .updateData(product.toEntity().toDocument());
+        .doc(product.id)
+        .update(product.toEntity().toDocument());
   }
 
   Future<void> createNewProduct(Product product) async {
@@ -100,13 +95,13 @@ class FirebaseShopRepository implements ShopRepository {
         int randomNumber = Random().nextInt(100000);
         String imageLocation = '/shops/$authorId/$randomNumber.jpg';
 
-        final StorageReference storageReference =
-            FirebaseStorage().ref().child(imageLocation);
-        final StorageUploadTask uploadTask = storageReference.putFile(image);
-        StorageTaskSnapshot storageTaskSnapshot;
+        final Reference storageReference =
+            FirebaseStorage.instance.ref().child(imageLocation);
+        final UploadTask uploadTask = storageReference.putFile(image);
+        TaskSnapshot storageTaskSnapshot;
 
-        StorageTaskSnapshot snapshot = await uploadTask.onComplete;
-        if (snapshot.error == null) {
+        TaskSnapshot snapshot = await uploadTask;
+        if (snapshot.state != TaskState.error) {
           storageTaskSnapshot = snapshot;
           final String downloadUrl =
               await storageTaskSnapshot.ref.getDownloadURL();
@@ -127,14 +122,13 @@ class FirebaseShopRepository implements ShopRepository {
       await Future.wait(downUrl.map((e) async {
         final isInProduct = await productCollection
             .where('photos', arrayContains: e.toString())
-            .getDocuments();
+            .get();
         final isInCollection = await collectionRef
             .where('photos', arrayContains: e.toString())
-            .getDocuments();
-        if (isInProduct.documents.length == 1 ||
-            isInCollection.documents.length == 1) {
-          final StorageReference storageReference =
-              await FirebaseStorage().getReferenceFromUrl(e);
+            .get();
+        if (isInProduct.docs.length == 1 || isInCollection.docs.length == 1) {
+          final Reference storageReference =
+              FirebaseStorage.instance.refFromURL(e);
 
           await storageReference.delete();
         }
@@ -148,18 +142,18 @@ class FirebaseShopRepository implements ShopRepository {
       String productId, List<dynamic> downUrl) async {
     try {
       await deletePhotos(downUrl);
-      await productCollection.document(productId).delete();
+      await productCollection.doc(productId).delete();
     } catch (_) {
       throw "Delete error";
     }
   }
 
   Future<List> getAllImages() async {
-    final collections = await collectionRef.getDocuments();
-    final products = await productCollection.getDocuments();
+    final collections = await collectionRef.get();
+    final products = await productCollection.get();
     List<dynamic> list = new List();
 
-    final collectionsEntity = collections.documents
+    final collectionsEntity = collections.docs
         .map(
           (e) => Collection.fromEntity(
             CollectionEntity.fromSnapshot(e),
@@ -167,7 +161,7 @@ class FirebaseShopRepository implements ShopRepository {
         )
         .toList();
 
-    final prodcutsEntity = products.documents
+    final prodcutsEntity = products.docs
         .map(
           (e) => Product.fromEntity(
             ProductEntity.fromSnapshot(e),

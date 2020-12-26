@@ -82,21 +82,21 @@ class ShopEntity extends Equatable {
 
   static ShopEntity fromSnapshot(DocumentSnapshot snap) {
     return ShopEntity(
-      snap.documentID,
-      snap.data['shopName'],
-      snap.data['shopDescription'],
-      snap.data['shopPhone'],
-      snap.data['shopLocation'],
-      snap.data['shopType'],
-      snap.data['shopPicture'],
-      snap.data['shopCover'],
-      snap.data['rate'],
-      snap.data['products'],
-      snap.data['shopCategories'],
-      snap.data['shopCollections'],
-      snap.data['shopFollowers'],
-      snap.data['notifiedFollowers'],
-      snap.data['ownerId'],
+      snap.id,
+      snap.data()['shopName'],
+      snap.data()['shopDescription'],
+      snap.data()['shopPhone'],
+      snap.data()['shopLocation'],
+      snap.data()['shopType'],
+      snap.data()['shopPicture'],
+      snap.data()['shopCover'],
+      snap.data()['rate'],
+      snap.data()['products'],
+      snap.data()['shopCategories'],
+      snap.data()['shopCollections'],
+      snap.data()['shopFollowers'],
+      snap.data()['notifiedFollowers'],
+      snap.data()['ownerId'],
     );
   }
 

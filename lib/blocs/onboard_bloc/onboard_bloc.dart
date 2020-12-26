@@ -8,8 +8,7 @@ enum MyEvent {
 }
 
 class OnBoardBloc extends Bloc<MyEvent, MyState> {
-  @override
-  MyState get initialState => OnBoardPage();
+  OnBoardBloc() : super(OnBoardPage());
 
   @override
   Stream<MyState> mapEventToState(MyEvent event) async* {

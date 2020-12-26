@@ -12,8 +12,8 @@ class UserRepository {
   final FacebookAuth _facebookAuth;
   final FirestoreService _firestoreService = FirestoreService();
 
-  User _currentUser;
-  User get currentUser => _currentUser;
+  UserModel _currentUser;
+  UserModel get currentUser => _currentUser;
 
   UserRepository(
       {FirebaseAuth firebaseAuth,
@@ -23,49 +23,35 @@ class UserRepository {
         _googleSignIn = googleSignin ?? GoogleSignIn(),
         _facebookAuth = facebookAuth ?? FacebookAuth.instance;
 
-  Future<FirebaseUser> signInWithGoogle() async {
+  Future<User> signInWithGoogle() async {
     try {
       final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
-      final AuthCredential credential = GoogleAuthProvider.getCredential(
+      final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
       await _firebaseAuth.signInWithCredential(credential);
-      return _firebaseAuth.currentUser();
+      return _firebaseAuth.currentUser;
     } catch (e) {
       throw new Error();
     }
   }
 
-  Future<FirebaseUser> signInWithFacebook() async {
+  Future<User> signInWithFacebook() async {
     String _token;
-    print(_token);
-    // try {
+
     await _facebookAuth.login();
     final userData = await FacebookAuth.instance.getUserData();
     print(userData);
-    AuthCredential credential =
-        FacebookAuthProvider.getCredential(accessToken: _token);
-    final FirebaseUser user =
+    AuthCredential credential = FacebookAuthProvider.credential(_token);
+    final User user =
         (await _firebaseAuth.signInWithCredential(credential)).user;
     print(user);
-    // if (result.status == FacebookAuthLoginResponse.ok) {
-    //   final user = await _firebaseAuth.currentUser();
-    //   print(user.email);
-    //   return user;
-    // } else if (result.status == FacebookAuthLoginResponse.error) {
-    //   return null;
-    // } else if (result.status == FacebookAuthLoginResponse.cancelled) {
-    //   return null;
-    // }
 
     return null;
-    // } catch (e) {
-    //   throw new Error();
-    // }
   }
 
   Future<void> signInWithCredentials(String email, String password) {
@@ -75,9 +61,9 @@ class UserRepository {
     );
   }
 
-  Future updateUserEmail(User updatedUser) async {
+  Future updateUserEmail(UserModel updatedUser) async {
     try {
-      final FirebaseUser user = await _firebaseAuth.currentUser();
+      final User user = _firebaseAuth.currentUser;
       user.updateEmail(updatedUser.email);
 
       _firestoreService.updateUser(updatedUser);
@@ -88,21 +74,21 @@ class UserRepository {
 
   Future updateUserPassword(String password) async {
     try {
-      final FirebaseUser user = await _firebaseAuth.currentUser();
+      final User user = _firebaseAuth.currentUser;
       user.updatePassword(password);
-    } catch (e) {}
+    } catch (e) {
+      print('Update password faild');
+    }
   }
 
-  Future updateUserData(User user) async {
+  Future updateUserData(UserModel user) async {
     _firestoreService.updateUser(user);
   }
 
-  Future deleteAccount() async {
-    final FirebaseUser user = await _firebaseAuth.currentUser();
+  void deleteAccount() {
+    final User user = _firebaseAuth.currentUser;
     user.delete();
   }
-
- 
 
   Future saveUser({
     @required String email,
@@ -110,9 +96,9 @@ class UserRepository {
     @required String userRole,
   }) async {
     try {
-      var authResult = await _firebaseAuth.currentUser();
+      var authResult = _firebaseAuth.currentUser;
 
-      _currentUser = User(
+      _currentUser = UserModel(
         id: authResult.uid,
         email: email,
         username: username,
@@ -139,7 +125,7 @@ class UserRepository {
         password: password,
       );
 
-      _currentUser = User(
+      _currentUser = UserModel(
         id: authResult.user.uid,
         email: email,
         username: username,
@@ -167,18 +153,18 @@ class UserRepository {
   }
 
   Future<bool> isSignedIn() async {
-    final currentUser = await _firebaseAuth.currentUser();
+    final currentUser = _firebaseAuth.currentUser;
     return currentUser != null;
   }
 
   Future<String> getEmail() async {
-    final user = await _firebaseAuth.currentUser();
+    final user = _firebaseAuth.currentUser;
 
     return user.email;
   }
 
   Future<User> getUser() async {
-    var user = await _firebaseAuth.currentUser();
+    var user = _firebaseAuth.currentUser;
     return _currentUser = await _firestoreService.getUser(user.uid);
   }
 }

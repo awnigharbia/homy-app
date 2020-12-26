@@ -35,7 +35,7 @@ class ShopRegister extends AuthenticationEvent {
 }
 
 class UpdateUser extends AuthenticationEvent {
-  final User user;
+  final UserModel user;
 
   UpdateUser({this.user});
 
@@ -47,7 +47,7 @@ class UpdateUser extends AuthenticationEvent {
 }
 
 class UpdateEmail extends AuthenticationEvent {
-  final User user;
+  final UserModel user;
 
   UpdateEmail({this.user});
 

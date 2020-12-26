@@ -1,9 +1,8 @@
-export "./subscriptions/subscriptions_screen.dart";
 export './add_edit_screen.dart';
 export './details_screen.dart';
 export './explore/explore_screen.dart';
 export './home/home_screen.dart';
-export './home_screen1.dart';
+export './homy_photos/homy_photos.dart';
 export './imagePicker/image_picker.dart';
 export './imagePicker/publish_page.dart';
 export './login/login_screen.dart';
@@ -36,5 +35,5 @@ export './signup/shop_signup.dart';
 export './signup/signup_screen.dart';
 export './splash/splash_screen.dart';
 export './story_view/story_view.dart';
+export "./subscriptions/subscriptions_screen.dart";
 export './wall/wall_screen.dart';
-export './homy_photos/homy_photos.dart';

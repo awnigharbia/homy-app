@@ -7,7 +7,7 @@ import 'package:flutter_firestore_todos/widgets/widgets.dart';
 import 'package:user_repository/user_repository.dart';
 
 class HomeScreen extends StatefulWidget {
-  final User user;
+  final UserModel user;
   HomeScreen({Key key, @required this.user}) : super(key: key);
 
   @override

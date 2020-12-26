@@ -56,10 +56,10 @@ class CollectionEntity extends Equatable {
     if (snap.data == null) return null;
 
     return CollectionEntity(
-      id: snap.documentID,
-      name: snap.data['name'],
-      photos: snap.data['photos'],
-      authorId: snap.data['authorId'],
+      id: snap.id,
+      name: snap.data()['name'],
+      photos: snap.data()['photos'],
+      authorId: snap.data()['authorId'],
     );
   }
 

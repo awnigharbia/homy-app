@@ -13,10 +13,8 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
 
   CollectionBloc({@required CollectionFirebase collectionFirebase})
       : assert(collectionFirebase != null),
-        _collectionRepository = collectionFirebase;
-
-  @override
-  CollectionState get initialState => CollectionLoading();
+        _collectionRepository = collectionFirebase,
+        super(CollectionLoading());
 
   @override
   Stream<CollectionState> mapEventToState(

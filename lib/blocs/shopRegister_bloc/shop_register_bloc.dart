@@ -12,10 +12,8 @@ class ShopRegisterBloc extends Bloc<ShopRegisterEvent, ShopRegisterState> {
 
   ShopRegisterBloc({@required ShopRepository shopRepository})
       : assert(shopRepository != null),
-        _shopRepository = shopRepository;
-
-  @override
-  ShopRegisterState get initialState => ShopRegisterState.empty();
+        _shopRepository = shopRepository,
+        super(ShopRegisterState.empty());
 
   @override
   Stream<Transition<ShopRegisterEvent, ShopRegisterState>> transformEvents(

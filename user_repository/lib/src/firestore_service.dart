@@ -3,13 +3,13 @@ import 'package:user_repository/src/models/user.dart';
 
 class FirestoreService {
   final CollectionReference _usersCollectionReference =
-      Firestore.instance.collection("users");
+      FirebaseFirestore.instance.collection("users");
 
-  Future createUser(User user) async {
+  Future createUser(UserModel user) async {
     try {
       await _usersCollectionReference
-          .document(user.id)
-          .setData(user.toEntity().toDocument());
+          .doc(user.id)
+          .set(user.toEntity().toDocument());
     } catch (e) {
       return e.message;
     }
@@ -17,17 +17,16 @@ class FirestoreService {
 
   Future getUser(String id) async {
     try {
-      var userData = await _usersCollectionReference.document(id).get();
-      return User.fromData(userData.data);
+      var userData = await _usersCollectionReference.doc(id).get();
+      return UserModel.fromData(userData.data());
     } catch (e) {
       return e.message;
     }
   }
 
-
-  Future updateUser(User updatedUser) async {
+  Future updateUser(UserModel updatedUser) async {
     return _usersCollectionReference
-        .document(updatedUser.id)
-        .updateData(updatedUser.toEntity().toDocument());
+        .doc(updatedUser.id)
+        .update(updatedUser.toEntity().toDocument());
   }
 }

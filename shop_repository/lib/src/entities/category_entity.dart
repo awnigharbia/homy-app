@@ -47,9 +47,9 @@ class CategoryEntity extends Equatable {
     if (snap.data == null) return null;
 
     return CategoryEntity(
-      id: snap.documentID,
-      name: snap.data['name'],
-      authorId: snap.data['authorId'],
+      id: snap.id,
+      name: snap.data()['name'],
+      authorId: snap.data()['authorId'],
     );
   }
 
